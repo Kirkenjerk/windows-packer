@@ -27,7 +27,7 @@ variable "cpu_num" {
 
 variable "disk_size" {
   type    = number
-  default = 102400
+  default = 50000
 }
 
 variable "mem_size" {
@@ -122,7 +122,7 @@ source "vsphere-iso" "windows" {
   RAM_reserve_all       = true
   disk_controller_type  = ["pvscsi"]
   #firmware             =  "bios"
-  floppy_files          = ["${var.autounattend_file}","install-openssh.ps1","setup/testwinrm.ps1","setup/setup.ps1", "setup/vmtools.cmd", "setup/appx.ps1", "setup/disable-server-manager.ps1", "setup/install-vm-tools.cmd", "setup/enable-winrm.ps1", "setup/enable-rdp.cmd", "setup/set-temp.ps1", "setup/resetnetwork.ps1", "setup/disable-network-discovery.cmd", "setup/choco-install.ps1", "setup/disable-winrm.ps1"]
+  floppy_files          = ["${var.autounattend_file}","setup/testwinrm.ps1","setup/setup.ps1", "setup/vmtools.cmd", "setup/appx.ps1", "setup/disable-server-manager.ps1", "setup/install-vm-tools.cmd", "setup/enable-winrm.ps1", "setup/enable-rdp.cmd", "setup/set-temp.ps1", "setup/resetnetwork.ps1", "setup/disable-network-discovery.cmd", "setup/choco-install.ps1", "setup/disable-winrm.ps1","sysprep.ps1","mdt.ps1"]
   floppy_img_path       = "${var.floppy_pvscsi}"
   guest_os_type         = "${var.vsphere_guest_os_type}"
   iso_paths             = ["${var.os_iso_path}","${var.vmtools_iso_path}"]
@@ -165,4 +165,12 @@ build {
     inline = ["dir c:\\"]
   }
 
+  provisioner "powershell" {
+    "scripts": [
+        "setup/mdt.ps1"
+      ],
+      "type": "powershell",
+      "only": ["vmsphere-iso"],
+      "valid_exit_codes": [0,16001]
+  }
 }
